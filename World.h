@@ -6,6 +6,7 @@
 
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
+#include <SFML/Graphics/Font.hpp>
 
 class World :private sf::NonCopyable
 {
@@ -16,6 +17,8 @@ private:
     Ball   mBall;
 
     sf::RectangleShape line;
+
+    sf::Font mFont;
 
     sf::RenderWindow& mWindow;
 

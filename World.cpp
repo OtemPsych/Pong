@@ -1,5 +1,8 @@
 #include "World.h"
 
+#include <string>
+#include <sstream>
+
 // Constructor
 World::World(sf::RenderWindow& window)
     : mPaddle1(Paddle::LEFT, Entity::PADDLE, sf::Vector2f(window.getSize().x, window.getSize().y))
@@ -10,6 +13,11 @@ World::World(sf::RenderWindow& window)
     line.setSize(sf::Vector2f(2.f, mWindow.getSize().y));
     line.setPosition(mWindow.getSize().x / 2, 0.f);
     line.setFillColor(sf::Color::White);
+
+    mFont.loadFromFile("Media/Sansation.ttf");
+
+    mPaddle1.setFont(mFont);
+    mPaddle2.setFont(mFont);
 }
 
 // Public Methods
@@ -49,4 +57,7 @@ const void World::draw()
     mWindow.draw(mBall.getShape());
 
     mWindow.draw(line);
+
+    mWindow.draw(mPaddle1.getScoreText());
+    mWindow.draw(mPaddle2.getScoreText());
 }

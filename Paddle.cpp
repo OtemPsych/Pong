@@ -2,12 +2,23 @@
 
 #include <iostream>
 #include <cmath>
+#include <string>
+#include <sstream>
+
+template <typename T>
+std::string NumberToString(T num)
+{
+    std::ostringstream temp;
+    temp << num;
+    return temp.str();
+}
 
 // Constructor
-Paddle::Paddle(const Side& side,
-               const Type& type, const sf::Vector2f& bounds)
+Paddle::Paddle(const Side& side, const Type& type,
+               const sf::Vector2f& bounds)
     : Entity(type, bounds)
     , mSide(side)
+    , mScore(0)
 {
 // Set Bounds
     sf::FloatRect shapeBounds = mShape.getLocalBounds();
@@ -36,22 +47,22 @@ const void Paddle::handleAI(Ball& ball)
         {
             double newXPosition = ball.getShape().getPosition().x;
             double newYPosition = ball.getShape().getPosition().y;
-            while ((newXPosition - ball.getShape().getRadius() - (-ball.getVelocity().x)) > 0.f) {
+            while ((newXPosition - (-ball.getVelocity().x)) > 0.f) {
                 newXPosition -= -ball.getVelocity().x;
                 newYPosition -= -ball.getVelocity().y;
             }
-            if (newYPosition - ball.getShape().getRadius() < 0.f)
+            if (newYPosition < 0.f)
                 std::cout << "WALL: Left | Up\n";
         }
         else if (ball.getVelocity().y > 0.f)    // Ball going Down
         {
             double newXPosition = ball.getShape().getPosition().x;
             double newYPosition = ball.getShape().getPosition().y;
-            while ((newXPosition - ball.getShape().getRadius() - (-ball.getVelocity().x)) > 0.f) {
+            while ((newXPosition - (-ball.getVelocity().x)) > 0.f) {
                 newXPosition -= -ball.getVelocity().x;
                 newYPosition += ball.getVelocity().y;
             }
-            if (newYPosition + ball.getShape().getRadius() > getBounds().y)
+            if (newYPosition > getBounds().y)
                 std::cout << "WALL: Left | Down\n";
         }
     }
@@ -61,22 +72,22 @@ const void Paddle::handleAI(Ball& ball)
         {
             double newXPosition = ball.getShape().getPosition().x;
             double newYPosition = ball.getShape().getPosition().y;
-            while ((newXPosition + ball.getShape().getRadius() + ball.getVelocity().x < getBounds().x)) {
+            while ((newXPosition + ball.getVelocity().x < getBounds().x)) {
                 newXPosition += ball.getVelocity().x;
                 newYPosition -= -ball.getVelocity().y;
             }
-            if (newYPosition - ball.getShape().getRadius() < 0.f)
+            if (newYPosition < 0.f)
                 std::cout << "WALL: Right | Up\n";
         }
         else if (ball.getVelocity().y > 0.f)    // Ball going Down
         {
             double newXPosition = ball.getShape().getPosition().x;
             double newYPosition = ball.getShape().getPosition().y;
-            while ((newXPosition + ball.getShape().getRadius() + ball.getVelocity().x < getBounds().x)) {
+            while ((newXPosition + ball.getVelocity().x < getBounds().x)) {
                 newXPosition += ball.getVelocity().x;
                 newYPosition += ball.getVelocity().y;
             }
-            if (newYPosition + ball.getShape().getRadius() > getBounds().y)
+            if (newYPosition > getBounds().y)
                 std::cout << "WALL: Right | DOWN\n";
         }
     }
@@ -110,6 +121,8 @@ const void Paddle::checkCollision()
     // Update
 const void Paddle::update(const sf::Time& dt)
 {
+    mScoreText.setString(NumberToString(mScore));
+
     float yMovement = 0.f;
     if (mMovement.UP)
         yMovement -= getVelocity().y;
@@ -117,4 +130,18 @@ const void Paddle::update(const sf::Time& dt)
         yMovement += getVelocity().y;
 
     mShape.move(sf::Vector2f(0.f, yMovement) * dt.asSeconds());
+}
+    // Set Font
+const void Paddle::setFont(const sf::Font& font)
+{
+    mScoreText.setFont(font);
+    mScoreText.setString(NumberToString(mScore));
+    mScoreText.setCharacterSize(48);
+    mScoreText.setOrigin(mScoreText.getLocalBounds().width / 2,
+                         mScoreText.getLocalBounds().height / 2);
+    if (mSide == LEFT)
+        mScoreText.setPosition(getBounds().x / 2 - 65.f, 15.f);
+    else
+        mScoreText.setPosition(getBounds().x / 2 + 65.f, 15.f);
+    mScoreText.setColor(sf::Color::White);
 }

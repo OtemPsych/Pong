@@ -57,8 +57,14 @@ const void Ball::checkCollision(Paddle& paddle1, Paddle& paddle2)
         setVelocity(sf::Vector2f(-getVelocity().x, getVelocity().y));
 
 // Out of Bounds
-    else if (mShape.getPosition().x < 0.f || mShape.getPosition().x + mShape.getRadius() * 2 > getBounds().x)
+    else if (mShape.getPosition().x < 0.f) {
+        paddle2.increaseScore();
         resetBall();
+    }
+    else if (mShape.getPosition().x + mShape.getRadius() * 2 > getBounds().x) {
+        paddle1.increaseScore();
+        resetBall();
+    }
 }
     // Reset Ball
 const void Ball::resetBall()
