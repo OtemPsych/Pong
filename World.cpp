@@ -1,7 +1,5 @@
 #include "World.h"
 
-#include <iostream>
-
 // Constructor
 World::World(sf::RenderWindow& window)
     : mPaddle1(Paddle::LEFT, Entity::PADDLE, sf::Vector2f(window.getSize().x, window.getSize().y))
