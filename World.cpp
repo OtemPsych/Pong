@@ -52,6 +52,11 @@ const void World::update(const sf::Time& dt)
         handleAI();
     handleCollision();
 
+    if (mBall.getSpeedMultiplier().multiplier == mBall.getSpeedMultiplier().originalMultiplier) {
+        mPaddle1.resetMultiplier();
+        mPaddle2.resetMultiplier();
+    }
+
     mPaddle1.update(dt);
     mPaddle2.update(dt);
     mBall.update(dt);

@@ -34,7 +34,7 @@ const void Ball::resetDirection()
     // Update
 const void Ball::update(const sf::Time& dt)
 {
-    mShape.move(getVelocity() * dt.asSeconds());
+    mShape.move(getVelocity() * addMultiplier(getSpeedMultiplier().increasingMultiplier) * dt.asSeconds());
 }
     // Check Collision
 const void Ball::checkCollision(Paddle& paddle1, Paddle& paddle2)
@@ -74,4 +74,5 @@ const void Ball::resetBall()
     mShape.setPosition(xPosition, yPosition);
 
     resetDirection();
+    resetMultiplier();
 }

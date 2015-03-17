@@ -130,7 +130,7 @@ const void Paddle::update(const sf::Time& dt)
     if (mMovement.DOWN)
         yMovement += getVelocity().y;
 
-    mShape.move(sf::Vector2f(0.f, yMovement) * dt.asSeconds());
+    mShape.move(sf::Vector2f(0.f, yMovement * addMultiplier(getSpeedMultiplier().increasingMultiplier)) * dt.asSeconds());
 }
     // Set Font
 const void Paddle::setFont(const sf::Font& font)
