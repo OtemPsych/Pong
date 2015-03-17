@@ -40,57 +40,58 @@ Paddle::Paddle(const Side& side, const Type& type,
     // Handle AI
 const void Paddle::handleAI(Ball& ball)
 {
-// Predict Trajectory
-    if (ball.getVelocity().x < 0.f)             // Ball going Left
-    {
-        if (ball.getVelocity().y < 0.f)         // Ball going Up
-        {
-            double newXPosition = ball.getShape().getPosition().x;
-            double newYPosition = ball.getShape().getPosition().y;
-            while ((newXPosition - (-ball.getVelocity().x)) > 0.f) {
-                newXPosition -= -ball.getVelocity().x;
-                newYPosition -= -ball.getVelocity().y;
-            }
-            if (newYPosition < 0.f)
-                std::cout << "WALL: Left | Up\n";
-        }
-        else if (ball.getVelocity().y > 0.f)    // Ball going Down
-        {
-            double newXPosition = ball.getShape().getPosition().x;
-            double newYPosition = ball.getShape().getPosition().y;
-            while ((newXPosition - (-ball.getVelocity().x)) > 0.f) {
-                newXPosition -= -ball.getVelocity().x;
-                newYPosition += ball.getVelocity().y;
-            }
-            if (newYPosition > getBounds().y)
-                std::cout << "WALL: Left | Down\n";
-        }
-    }
-    else if (ball.getVelocity().x > 0.f)        // Ball going Right
-    {
-        if (ball.getVelocity().y < 0.f)         // Ball going Up
-        {
-            double newXPosition = ball.getShape().getPosition().x;
-            double newYPosition = ball.getShape().getPosition().y;
-            while ((newXPosition + ball.getVelocity().x < getBounds().x)) {
-                newXPosition += ball.getVelocity().x;
-                newYPosition -= -ball.getVelocity().y;
-            }
-            if (newYPosition < 0.f)
-                std::cout << "WALL: Right | Up\n";
-        }
-        else if (ball.getVelocity().y > 0.f)    // Ball going Down
-        {
-            double newXPosition = ball.getShape().getPosition().x;
-            double newYPosition = ball.getShape().getPosition().y;
-            while ((newXPosition + ball.getVelocity().x < getBounds().x)) {
-                newXPosition += ball.getVelocity().x;
-                newYPosition += ball.getVelocity().y;
-            }
-            if (newYPosition > getBounds().y)
-                std::cout << "WALL: Right | DOWN\n";
-        }
-    }
+//// Predict Trajectory
+//    if (ball.getVelocity().x < 0.f)             // Ball going Left
+//    {
+//        if (ball.getVelocity().y < 0.f)         // Ball going Up
+//        {
+//            double newXPosition = ball.getShape().getPosition().x;
+//            double newYPosition = ball.getShape().getPosition().y;
+//            while ((newXPosition - (-ball.getVelocity().x)) > 0.f) {
+//                newXPosition -= -ball.getVelocity().x;
+//                newYPosition -= -ball.getVelocity().y;
+//            }
+//            if (newYPosition < 0.f) {
+//                std::cout << "WALL: Left | Up\n";
+//            }
+//        }
+//        else if (ball.getVelocity().y > 0.f)    // Ball going Down
+//        {
+//            double newXPosition = ball.getShape().getPosition().x;
+//            double newYPosition = ball.getShape().getPosition().y;
+//            while ((newXPosition - (-ball.getVelocity().x)) > 0.f) {
+//                newXPosition -= -ball.getVelocity().x;
+//                newYPosition += ball.getVelocity().y;
+//            }
+//            if (newYPosition > getBounds().y)
+//                std::cout << "WALL: Left | Down\n";
+//        }
+//    }
+//    else if (ball.getVelocity().x > 0.f)        // Ball going Right
+//    {
+//        if (ball.getVelocity().y < 0.f)         // Ball going Up
+//        {
+//            double newXPosition = ball.getShape().getPosition().x;
+//            double newYPosition = ball.getShape().getPosition().y;
+//            while ((newXPosition + ball.getVelocity().x < getBounds().x)) {
+//                newXPosition += ball.getVelocity().x;
+//                newYPosition -= -ball.getVelocity().y;
+//            }
+//            if (newYPosition < 0.f)
+//                std::cout << "WALL: Right | Up\n";
+//        }
+//        else if (ball.getVelocity().y > 0.f)    // Ball going Down
+//        {
+//            double newXPosition = ball.getShape().getPosition().x;
+//            double newYPosition = ball.getShape().getPosition().y;
+//            while ((newXPosition + ball.getVelocity().x < getBounds().x)) {
+//                newXPosition += ball.getVelocity().x;
+//                newYPosition += ball.getVelocity().y;
+//            }
+//            if (newYPosition > getBounds().y)
+//                std::cout << "WALL: Right | DOWN\n";
+//        }
+//    }
 // Recenter paddle if ball is not heading towards it
     if ((mSide == RIGHT && ball.getVelocity().x < 0.f) || (mSide == LEFT && ball.getVelocity().x > 0.f)){
         if (mShape.getPosition().y + mShape.getSize().y / 2 < getBounds().y / 2)

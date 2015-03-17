@@ -18,7 +18,7 @@ private:
 // Private Data Members
     sf::RectangleShape mShape;
     Side               mSide;
-    struct {
+    struct movement{
         bool UP,
              DOWN;
     }                  mMovement;
@@ -36,6 +36,7 @@ public:
     const void setFont(const sf::Font& font);
 
     inline const sf::RectangleShape& getShape() { return mShape; }
+    inline movement& getMovement() { return mMovement; }
 
     inline const void increaseScore() { mScore++; }
     inline const int getScore() const { return mScore; }

@@ -4,6 +4,8 @@
 #include "Paddle.h"
 #include "Ball.h"
 
+#include <memory>
+
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
 #include <SFML/Graphics/Font.hpp>
@@ -18,9 +20,18 @@ private:
 
     sf::RectangleShape line;
 
-    sf::Font mFont;
+    struct {
+        bool PvP,
+             PvAI,
+             AIvAI;
+    }                 mGameMode;
+    sf::Text          mModeText;
+    sf::Text          mChangeModeText;
 
+    sf::Font          mFont;
     sf::RenderWindow& mWindow;
+// Private Method
+    const void setFont();
 
 public:
 // Constructor
@@ -31,5 +42,8 @@ public:
     const void handleAI();
     const void handleCollision();
     const void draw();
+
+    const void resetGame();
+    const void setModeText();
 };
 #endif // World_H_
