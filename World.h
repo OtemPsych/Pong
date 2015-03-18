@@ -27,6 +27,8 @@ private:
     }                 mGameMode;
     sf::Text          mModeText;
     sf::Text          mChangeModeText;
+    sf::Text          mPlayer1Controls;
+    sf::Text          mPlayer2Controls;
 
     sf::Font          mFont;
     sf::RenderWindow& mWindow;

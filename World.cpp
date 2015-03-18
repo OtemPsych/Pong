@@ -27,6 +27,22 @@ World::World(sf::RenderWindow& window)
     mChangeModeText.setPosition(mWindow.getSize().x - 150.f, mWindow.getSize().y - 20.f);
     mChangeModeText.setColor(sf::Color::White);
 
+    mPlayer1Controls.setFont(mFont);
+    mPlayer1Controls.setString("Player 1\nW | S to move");
+    mPlayer1Controls.setCharacterSize(15);
+    mPlayer1Controls.setOrigin(mPlayer1Controls.getLocalBounds().width / 2,
+                               mPlayer1Controls.getLocalBounds().height / 2);
+    mPlayer1Controls.setPosition(mWindow.getSize().x / 2 - mWindow.getSize().x / 3, 70.f);
+    mPlayer1Controls.setColor(sf::Color::White);
+
+    mPlayer2Controls.setFont(mFont);
+    mPlayer2Controls.setString("Player 2\nUp | Down to move");
+    mPlayer2Controls.setCharacterSize(15);
+    mPlayer2Controls.setOrigin(mPlayer2Controls.getLocalBounds().width / 2,
+                               mPlayer2Controls.getLocalBounds().height / 2);
+    mPlayer2Controls.setPosition(mWindow.getSize().x / 2 + mWindow.getSize().x / 3, 70.f);
+    mPlayer2Controls.setColor(sf::Color::White);
+
     mPaddle1.setFont(mFont);
     mPaddle2.setFont(mFont);
 }
@@ -64,6 +80,11 @@ const void World::update(const sf::Time& dt)
     if (mModeText.getColor().a > 0) {
         int a = mModeText.getColor().a;
         mModeText.setColor(sf::Color(255,255,255,a -= 3.f));
+    }
+    if (mPlayer1Controls.getColor().a > 0) {
+        int a = mPlayer1Controls.getColor().a;
+        mPlayer1Controls.setColor(sf::Color(255,255,255,a -= 1.f));
+        mPlayer2Controls.setColor(mPlayer1Controls.getColor());
     }
 }
     // Handle Input
@@ -131,6 +152,11 @@ const void World::draw()
         mWindow.draw(mModeText);
 
     mWindow.draw(mChangeModeText);
+
+    if (mPlayer1Controls.getColor().a > 0) {
+        mWindow.draw(mPlayer1Controls);
+        mWindow.draw(mPlayer2Controls);
+    }
 }
     // Reset Game
 const void World::resetGame()

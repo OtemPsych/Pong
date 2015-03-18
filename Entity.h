@@ -34,6 +34,5 @@ public:
     inline const void resetMultiplier() { mSpeedMultiplier.multiplier = mSpeedMultiplier.originalMultiplier; }
 
     inline const sf::Vector2f& getBounds() const { return mWindowBounds; }
-
 };
 #endif // Entity_H_
