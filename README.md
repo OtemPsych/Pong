@@ -6,6 +6,6 @@ Pong
 
 The program WinRAR is required in order to unrar the file
 
-Download: http://bit.ly/18EpY4n
+Download: http://bit.ly/1CuA8AQ
 
 Tested on a Windows machine.
