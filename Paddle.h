@@ -3,7 +3,6 @@
 
 #include "Entity.h"
 #include "Ball.h"
-#include "TextHolder.h"
 
 #include <SFML/Graphics/Font.hpp>
 #include <SFML/Graphics/Text.hpp>
@@ -24,26 +23,23 @@ private:
              DOWN;
     }                  mMovement;
     int                mScore;
-
-//    sf::Vector2f newPosition;
+    sf::Text           mScoreText;
 
 public:
 // Constructor
     Paddle(const Side& side, const Type& type,
            const sf::Vector2f& bounds);
 // Public Methods
-    const void handleAI(Ball& ball, Ball& futureBall, const int futureBallMultiplier, const sf::Time& dt);
-    const void handleCollision();
+    const void handleAI(Ball& ball);
+    const void checkCollision();
     virtual const void update(const sf::Time& dt);
-    const void updateScoreText(sf::Text& text);
-    const void setFont(TextHolder& holder, const sf::Font& font);
+    const void setFont(const sf::Font& font);
 
     inline const sf::RectangleShape& getShape() { return mShape; }
     inline movement& getMovement() { return mMovement; }
 
     inline const void increaseScore() { mScore++; }
     inline const int getScore() const { return mScore; }
-
-    inline const Side& getSide() const { return mSide; }
+    inline const sf::Text& getScoreText() { return mScoreText; }
 };
 #endif // Paddle_H_
