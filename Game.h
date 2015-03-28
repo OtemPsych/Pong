@@ -11,7 +11,7 @@
 class Game :private sf::NonCopyable
 {
 private:
-// Private Data Member
+// Private Data Members
     sf::RenderWindow mWindow;
     TextHolder       mTextHolder;
     sf::Font         mFont;
@@ -32,13 +32,13 @@ private:
     const void handleAI(const sf::Time& dt);
     const void render();
 
-    const void setModeText();
+    const void setModeText() const;
     const void loadTexts();
 
 public:
 // Constructor
     Game();
-// Public Methods
+// Public Method
     const void run();
 };
 #endif // Game_H_

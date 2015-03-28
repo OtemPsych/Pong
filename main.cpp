@@ -8,8 +8,13 @@ int main()
 {
     srand(time(0));
 
-    Game game;
-    game.run();
+    try {
+        Game game;
+        game.run();
+    }
+    catch (std::exception& e) {
+        std::cout << "\nEXCEPTION: " << e.what() << std::endl;
+    }
 
     return 0;
 }

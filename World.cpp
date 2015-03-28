@@ -6,7 +6,7 @@ World::World(TextHolder& holder, sf::RenderWindow& window)
     , mPaddle2(Paddle::RIGHT, Entity::PADDLE, sf::Vector2f(window.getSize().x, window.getSize().y))
     , mBall(Entity::BALL, sf::Vector2f(window.getSize().x, window.getSize().y))
     , mBallPrediction(Entity::BALL, sf::Vector2f(window.getSize().x, window.getSize().y))
-    , mBallMultiplier(4)
+    , mBallMultiplier(4.f)
     , mTextHolder(holder)
     , mWindow(window)
 {
@@ -33,26 +33,14 @@ const void World::update(const sf::Time& dt)
     mBall.update(dt);
     mBallPrediction.update(dt);
 
-    auto& modeText = mTextHolder.get(Texts::Mode);
-    auto& player1Controls = mTextHolder.get(Texts::Player1Controls);
-    auto& player2Controls = mTextHolder.get(Texts::Player2Contols);
-
-    checkScoreChanges();
-
     if (mBall.getCollisionCheck()) {
         mBallPrediction = mBall;
         mBallPrediction.setVelocity(sf::Vector2f(mBall.getVelocity().x * mBallMultiplier, mBall.getVelocity().y * mBallMultiplier));
     }
 
-    if (modeText.getColor().a > 0) {
-        int a = modeText.getColor().a;
-        modeText.setColor(sf::Color(255,255,255,a -= 3.f));
-    }
-    if (player1Controls.getColor().a > 0) {
-        int a = player1Controls.getColor().a;
-        player1Controls.setColor(sf::Color(255,255,255,a -= 1.f));
-        player2Controls.setColor(player1Controls.getColor());
-    }
+    checkScoreChanges();
+    mTextHolder.fadeText(Texts::Player1Controls, 1.f);
+    mTextHolder.fadeText(Texts::Player2Controls, 1.f);
 }
     // Handle Input
 const void World::handleInput(const sf::Keyboard::Key& key, const bool isPressed)
@@ -86,30 +74,29 @@ const void World::handleCollision()
     // Draw
 const void World::draw()
 {
+    // Entities
     mWindow.draw(mPaddle1.getShape());
     mWindow.draw(mPaddle2.getShape());
     mWindow.draw(mBall.getShape());
-
     mWindow.draw(line);
 
+    // Scores
+    mWindow.draw(mTextHolder.get(Texts::Player1Score));
+    mWindow.draw(mTextHolder.get(Texts::Player2Score));
+
+    // Game Mode
     auto& modeText = mTextHolder.get(Texts::Mode);
-    auto& changeMode = mTextHolder.get(Texts::ChangeMode);
-    auto& player1Controls = mTextHolder.get(Texts::Player1Controls);
-    auto& player1Score = mTextHolder.get(Texts::Player1Score);
-    auto& player2Controls = mTextHolder.get(Texts::Player2Contols);
-    auto& player2Score = mTextHolder.get(Texts::Player2Score);
-
-    mWindow.draw(player1Score);
-    mWindow.draw(player2Score);
-
-    if (modeText.getColor().a > 0)
+    if (modeText.getColor().a > 0.f)
         mWindow.draw(modeText);
 
-    mWindow.draw(changeMode);
+    // Change Game Mode
+    mWindow.draw(mTextHolder.get(Texts::ChangeMode));
 
-    if (player1Controls.getColor().a > 0) {
+    // Player Controls
+    auto& player1Controls = mTextHolder.get(Texts::Player1Controls);
+    if (player1Controls.getColor().a > 0.f) {
         mWindow.draw(player1Controls);
-        mWindow.draw(player2Controls);
+        mWindow.draw(mTextHolder.get(Texts::Player2Controls));
     }
 
  //   mWindow.draw(mBallPrediction.getShape());
@@ -117,22 +104,20 @@ const void World::draw()
     // Check Score Changes
 const void World::checkScoreChanges()
 {
-    auto& player1Score = mTextHolder.get(Texts::Player1Score);
-    auto& player2Score = mTextHolder.get(Texts::Player2Score);
-
     static int paddle1Score = 0;
     static int paddle2Score = 0;
+
     if (mPaddle1.getScore() != paddle1Score) {
         paddle1Score = mPaddle1.getScore();
         mBallPrediction = mBall;
         mBallPrediction.setVelocity(sf::Vector2f(mBall.getVelocity().x * mBallMultiplier, mBall.getVelocity().y * mBallMultiplier));
-        mPaddle1.updateScoreText(player1Score);
+        mPaddle1.updateScoreText(mTextHolder.get(Texts::Player1Score));
     }
     else if (mPaddle2.getScore() != paddle2Score) {
         paddle2Score = mPaddle2.getScore();
         mBallPrediction = mBall;
         mBallPrediction.setVelocity(sf::Vector2f(mBall.getVelocity().x * mBallMultiplier, mBall.getVelocity().y * mBallMultiplier));
-        mPaddle2.updateScoreText(player2Score);
+        mPaddle2.updateScoreText(mTextHolder.get(Texts::Player2Score));
     }
 }
     // Reset Game
@@ -150,7 +135,7 @@ const void World::resetGame(const sf::Font& font)
 const void World::setFonts(const sf::Font& font)
 {
     mTextHolder.load(Texts::Player1Controls, font, "Player 1\nW | S to move", 15.f, sf::Vector2f(mWindow.getSize().x / 2 - mWindow.getSize().x / 3, 70.f), sf::Color::White);
-    mTextHolder.load(Texts::Player2Contols, font, "Player 2\nUp | Down", 15.f, sf::Vector2f(mWindow.getSize().x / 2 + mWindow.getSize().x / 3, 70.f), sf::Color::White);
+    mTextHolder.load(Texts::Player2Controls, font, "Player 2\nUp | Down", 15.f, sf::Vector2f(mWindow.getSize().x / 2 + mWindow.getSize().x / 3, 70.f), sf::Color::White);
 
     mPaddle1.setFont(mTextHolder, font);
     mPaddle2.setFont(mTextHolder, font);

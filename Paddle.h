@@ -25,8 +25,6 @@ private:
     }                  mMovement;
     int                mScore;
 
-//    sf::Vector2f newPosition;
-
 public:
 // Constructor
     Paddle(const Side& side, const Type& type,
@@ -43,7 +41,5 @@ public:
 
     inline const void increaseScore() { mScore++; }
     inline const int getScore() const { return mScore; }
-
-    inline const Side& getSide() const { return mSide; }
 };
 #endif // Paddle_H_

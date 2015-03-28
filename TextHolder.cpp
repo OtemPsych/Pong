@@ -5,7 +5,7 @@
 // Public Methods
     // Load
 const void TextHolder::load(const Texts::ID& id, const sf::Font& font,
-                            const std::string& str, const int charSize,
+                            const std::string& str, const unsigned charSize,
                             const sf::Vector2f& pos, const sf::Color& color)
 {
     std::unique_ptr<sf::Text> text(new sf::Text());
@@ -28,4 +28,15 @@ sf::Text& TextHolder::get(const Texts::ID& id) const
     assert(found != mTextHolder.end());
 
     return *found->second;
+}
+    // Fade Text
+const void TextHolder::fadeText(const Texts::ID& id, const float rate) const
+{
+    auto& text = get(id);
+    if (text.getColor().a > 0.f)
+        text.setColor(sf::Color(text.getColor().r,
+                                text.getColor().g,
+                                text.getColor().b,
+                                (text.getColor().a - rate >= 0.f) ? text.getColor().a - rate
+                                                                  : 0.f));
 }

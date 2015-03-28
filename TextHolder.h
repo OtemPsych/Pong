@@ -10,7 +10,7 @@
 
 namespace Texts {
     enum ID { Mode, ChangeMode, Player1Controls,
-              Player1Score, Player2Contols, Player2Score };
+              Player1Score, Player2Controls, Player2Score };
 }
 class TextHolder :private sf::NonCopyable
 {
@@ -21,9 +21,10 @@ private:
 public:
 // Public Methods
     const void load(const Texts::ID& id, const sf::Font& font,
-                    const std::string& str, const int charSize,
+                    const std::string& str, const unsigned charSize,
                     const sf::Vector2f& pos, const sf::Color& color);
-
     sf::Text& get(const Texts::ID& id) const;
+
+    const void fadeText(const Texts::ID& id, const float rate) const;
 };
 #endif // TextHolder_H_

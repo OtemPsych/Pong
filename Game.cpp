@@ -1,5 +1,7 @@
 #include "Game.h"
 
+#include <stdexcept>
+
 #include <SFML/Window/Event.hpp>
 
 const sf::Time TimePerFrame = sf::seconds(1.f / 60.f);
@@ -13,11 +15,11 @@ Game::Game()
 {
     mWindow.setFramerateLimit(720);
 
-    mGameMode.PvAI = true;
-    mGameMode.PvP = false;
-    mGameMode.AIvAI = false;
+    mGameMode.AIvAI = true;
+    mGameMode.PvAI = mGameMode.PvP = false;
 
-    mFont.loadFromFile("Media/Sansation.ttf");
+    if (!mFont.loadFromFile("Media/Sansation.ttf"))
+        throw std::runtime_error("Game::Game() - Failed to load font");
 
     loadTexts();
 }
@@ -39,7 +41,6 @@ const void Game::processEvents()
             break;
         case sf::Event::KeyReleased:
             handleInput(event.key.code, false);
-            break;
         }
     }
 }
@@ -48,11 +49,7 @@ const void Game::update(const sf::Time& dt)
 {
     mWorld.update(dt);
 
-    auto modeText = mTextHolder.get(Texts::Mode);
-    if (modeText.getColor().a > 0) {
-        int a = modeText.getColor().a;
-        modeText.setColor(sf::Color(255,255,255,a -= 3.f));
-    }
+    mTextHolder.fadeText(Texts::Mode, 3.f);
 }
     // Handle Input
 const void Game::handleInput(const sf::Keyboard::Key& key,
@@ -94,7 +91,7 @@ const void Game::render()
     mWindow.display();
 }
     // Set Mode Text
-const void Game::setModeText()
+const void Game::setModeText() const
 {
     auto& mode = mTextHolder.get(Texts::Mode);
 
@@ -113,7 +110,7 @@ const void Game::setModeText()
     // Load Texts
 const void Game::loadTexts()
 {
-    mTextHolder.load(Texts::Mode, mFont, "Player vs AI", 45.f,
+    mTextHolder.load(Texts::Mode, mFont, "AI vs AI", 45.f,
                      sf::Vector2f(mWindow.getSize().x / 2, 95.f), sf::Color::White);
 
     mTextHolder.load(Texts::ChangeMode, mFont, "Press 'T' to change Game Mode", 15.f,
