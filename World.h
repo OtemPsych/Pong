@@ -3,8 +3,7 @@
 
 #include "Paddle.h"
 #include "Ball.h"
-
-#include <memory>
+#include "TextHolder.h"
 
 #include <SFML/Window/Keyboard.hpp>
 #include <SFML/Graphics/RectangleShape.hpp>
@@ -18,34 +17,27 @@ private:
     Paddle mPaddle2;
     Ball   mBall;
 
+    Ball   mBallPrediction;
+    int    mBallMultiplier;
+
     sf::RectangleShape line;
 
-    struct {
-        bool PvP,
-             PvAI,
-             AIvAI;
-    }                 mGameMode;
-    sf::Text          mModeText;
-    sf::Text          mChangeModeText;
-    sf::Text          mPlayer1Controls;
-    sf::Text          mPlayer2Controls;
-
-    sf::Font          mFont;
+    TextHolder&       mTextHolder;
     sf::RenderWindow& mWindow;
-// Private Method
-    const void setFont();
 
 public:
 // Constructor
-    explicit World(sf::RenderWindow& window);
+    World(TextHolder& holder, sf::RenderWindow& window);
 // Public Methods
     const void update(const sf::Time& dt);
     const void handleInput(const sf::Keyboard::Key& key, const bool isPressed);
-    const void handleAI();
+    const void handleAI(const bool mode, const sf::Time& dt);
     const void handleCollision();
     const void draw();
 
-    const void resetGame();
-    const void setModeText();
+    const void checkScoreChanges();
+    const void resetGame(const sf::Font& font);
+
+    const void setFonts(const sf::Font& font);
 };
 #endif // World_H_

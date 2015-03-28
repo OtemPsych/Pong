@@ -1,8 +1,5 @@
 #include "Paddle.h"
 
-#include <iostream>
-#include <cmath>
-#include <string>
 #include <sstream>
 
 template <typename T>
@@ -12,7 +9,6 @@ std::string NumberToString(T num)
     temp << num;
     return temp.str();
 }
-
 // Constructor
 Paddle::Paddle(const Side& side, const Type& type,
                const sf::Vector2f& bounds)
@@ -38,60 +34,8 @@ Paddle::Paddle(const Side& side, const Type& type,
 
 // Public Methods
     // Handle AI
-const void Paddle::handleAI(Ball& ball)
+const void Paddle::handleAI(Ball& ball, Ball& futureBall, const int futureBallMultiplier, const sf::Time& dt)
 {
-//// Predict Trajectory
-//    if (ball.getVelocity().x < 0.f)             // Ball going Left
-//    {
-//        if (ball.getVelocity().y < 0.f)         // Ball going Up
-//        {
-//            double newXPosition = ball.getShape().getPosition().x;
-//            double newYPosition = ball.getShape().getPosition().y;
-//            while ((newXPosition - (-ball.getVelocity().x)) > 0.f) {
-//                newXPosition -= -ball.getVelocity().x;
-//                newYPosition -= -ball.getVelocity().y;
-//            }
-//            if (newYPosition < 0.f) {
-//                std::cout << "WALL: Left | Up\n";
-//            }
-//        }
-//        else if (ball.getVelocity().y > 0.f)    // Ball going Down
-//        {
-//            double newXPosition = ball.getShape().getPosition().x;
-//            double newYPosition = ball.getShape().getPosition().y;
-//            while ((newXPosition - (-ball.getVelocity().x)) > 0.f) {
-//                newXPosition -= -ball.getVelocity().x;
-//                newYPosition += ball.getVelocity().y;
-//            }
-//            if (newYPosition > getBounds().y)
-//                std::cout << "WALL: Left | Down\n";
-//        }
-//    }
-//    else if (ball.getVelocity().x > 0.f)        // Ball going Right
-//    {
-//        if (ball.getVelocity().y < 0.f)         // Ball going Up
-//        {
-//            double newXPosition = ball.getShape().getPosition().x;
-//            double newYPosition = ball.getShape().getPosition().y;
-//            while ((newXPosition + ball.getVelocity().x < getBounds().x)) {
-//                newXPosition += ball.getVelocity().x;
-//                newYPosition -= -ball.getVelocity().y;
-//            }
-//            if (newYPosition < 0.f)
-//                std::cout << "WALL: Right | Up\n";
-//        }
-//        else if (ball.getVelocity().y > 0.f)    // Ball going Down
-//        {
-//            double newXPosition = ball.getShape().getPosition().x;
-//            double newYPosition = ball.getShape().getPosition().y;
-//            while ((newXPosition + ball.getVelocity().x < getBounds().x)) {
-//                newXPosition += ball.getVelocity().x;
-//                newYPosition += ball.getVelocity().y;
-//            }
-//            if (newYPosition > getBounds().y)
-//                std::cout << "WALL: Right | DOWN\n";
-//        }
-//    }
 // Recenter paddle if ball is not heading towards it
     if ((mSide == RIGHT && ball.getVelocity().x < 0.f) || (mSide == LEFT && ball.getVelocity().x > 0.f)){
         if (mShape.getPosition().y + mShape.getSize().y / 2 < getBounds().y / 2)
@@ -100,19 +44,23 @@ const void Paddle::handleAI(Ball& ball)
             mMovement.UP = true;
     }
     else {
-// Chase Ball
-        if (mShape.getPosition().y > ball.getShape().getPosition().y + ball.getShape().getRadius() * 2) {
+    // Chase Future Ball
+        if (mShape.getPosition().y + mShape.getSize().y / 2 > futureBall.getShape().getPosition().y + futureBall.getShape().getRadius() * 2) {
             mMovement.UP = true;
             mMovement.DOWN = false;
         }
-        else if (mShape.getPosition().y + mShape.getSize().y < ball.getShape().getPosition().y) {
+        else if (mShape.getPosition().y + mShape.getSize().y / 2 < futureBall.getShape().getPosition().y) {
             mMovement.DOWN = true;
             mMovement.UP = false;
+        }
+        else {
+            mMovement.UP = false;
+            mMovement.DOWN = false;
         }
     }
 }
     // Check Collision
-const void Paddle::checkCollision()
+const void Paddle::handleCollision()
 {
     if (mShape.getPosition().y < 0.f)
         mMovement.UP = false;
@@ -122,8 +70,6 @@ const void Paddle::checkCollision()
     // Update
 const void Paddle::update(const sf::Time& dt)
 {
-    mScoreText.setString(NumberToString(mScore));
-
     float yMovement = 0.f;
     if (mMovement.UP)
         yMovement -= getVelocity().y;
@@ -132,17 +78,18 @@ const void Paddle::update(const sf::Time& dt)
 
     mShape.move(sf::Vector2f(0.f, yMovement * addMultiplier(getSpeedMultiplier().increasingMultiplier)) * dt.asSeconds());
 }
-    // Set Font
-const void Paddle::setFont(const sf::Font& font)
+    // Update Score Text
+const void Paddle::updateScoreText(sf::Text& text)
 {
-    mScoreText.setFont(font);
-    mScoreText.setString(NumberToString(mScore));
-    mScoreText.setCharacterSize(48);
-    mScoreText.setOrigin(mScoreText.getLocalBounds().width / 2,
-                         mScoreText.getLocalBounds().height / 2);
+    text.setString(NumberToString(mScore));
+}
+    // Set Font
+const void Paddle::setFont(TextHolder& holder, const sf::Font& font)
+{
     if (mSide == LEFT)
-        mScoreText.setPosition(getBounds().x / 2 - 65.f, 15.f);
+        holder.load(Texts::Player1Score, font, NumberToString(mScore),
+                    48, sf::Vector2f(getBounds().x / 2 - 65.f, 15.f), sf::Color::White);
     else
-        mScoreText.setPosition(getBounds().x / 2 + 65.f, 15.f);
-    mScoreText.setColor(sf::Color::White);
+        holder.load(Texts::Player2Score, font, NumberToString(mScore),
+                    48, sf::Vector2f(getBounds().x / 2 + 65.f, 15.f), sf::Color::White);
 }

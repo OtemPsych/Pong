@@ -1,73 +1,28 @@
 #include "World.h"
 
 // Constructor
-World::World(sf::RenderWindow& window)
+World::World(TextHolder& holder, sf::RenderWindow& window)
     : mPaddle1(Paddle::LEFT, Entity::PADDLE, sf::Vector2f(window.getSize().x, window.getSize().y))
     , mPaddle2(Paddle::RIGHT, Entity::PADDLE, sf::Vector2f(window.getSize().x, window.getSize().y))
     , mBall(Entity::BALL, sf::Vector2f(window.getSize().x, window.getSize().y))
+    , mBallPrediction(Entity::BALL, sf::Vector2f(window.getSize().x, window.getSize().y))
+    , mBallMultiplier(4)
+    , mTextHolder(holder)
     , mWindow(window)
 {
     line.setSize(sf::Vector2f(2.f, mWindow.getSize().y));
     line.setPosition(mWindow.getSize().x / 2, 0.f);
     line.setFillColor(sf::Color::White);
 
-    mGameMode.PvAI = true;
-    mGameMode.PvP = false;
-    mGameMode.AIvAI = false;
-
-    mFont.loadFromFile("Media/Sansation.ttf");
-
-    setFont();
-
-    mChangeModeText.setFont(mFont);
-    mChangeModeText.setString("Press 'T' to change Game Mode");
-    mChangeModeText.setCharacterSize(15);
-    mChangeModeText.setOrigin(mChangeModeText.getLocalBounds().width / 2,
-                              mChangeModeText.getLocalBounds().height / 2);
-    mChangeModeText.setPosition(mWindow.getSize().x - 150.f, mWindow.getSize().y - 20.f);
-    mChangeModeText.setColor(sf::Color::White);
-
-    mPlayer1Controls.setFont(mFont);
-    mPlayer1Controls.setString("Player 1\nW | S to move");
-    mPlayer1Controls.setCharacterSize(15);
-    mPlayer1Controls.setOrigin(mPlayer1Controls.getLocalBounds().width / 2,
-                               mPlayer1Controls.getLocalBounds().height / 2);
-    mPlayer1Controls.setPosition(mWindow.getSize().x / 2 - mWindow.getSize().x / 3, 70.f);
-    mPlayer1Controls.setColor(sf::Color::White);
-
-    mPlayer2Controls.setFont(mFont);
-    mPlayer2Controls.setString("Player 2\nUp | Down to move");
-    mPlayer2Controls.setCharacterSize(15);
-    mPlayer2Controls.setOrigin(mPlayer2Controls.getLocalBounds().width / 2,
-                               mPlayer2Controls.getLocalBounds().height / 2);
-    mPlayer2Controls.setPosition(mWindow.getSize().x / 2 + mWindow.getSize().x / 3, 70.f);
-    mPlayer2Controls.setColor(sf::Color::White);
-
-    mPaddle1.setFont(mFont);
-    mPaddle2.setFont(mFont);
-}
-
-// Private Method
-    // Set Font
-const void World::setFont()
-{
-    mModeText.setFont(mFont);
-    setModeText();
-    mModeText.setCharacterSize(45);
-    mModeText.setOrigin(mModeText.getLocalBounds().width / 2,
-                        mModeText.getLocalBounds().height / 2);
-    mModeText.setPosition(mWindow.getSize().x / 2, 95.f);
-    mModeText.setColor(sf::Color::White);
+    mBallPrediction = mBall;
+    mBallPrediction.setVelocity(sf::Vector2f(mBall.getVelocity().x * mBallMultiplier,
+                                             mBall.getVelocity().y * mBallMultiplier));
 }
 
 // Public Methods
     // Update
 const void World::update(const sf::Time& dt)
 {
-    if (mGameMode.PvAI || mGameMode.AIvAI)
-        handleAI();
-    handleCollision();
-
     if (mBall.getSpeedMultiplier().multiplier == mBall.getSpeedMultiplier().originalMultiplier) {
         mPaddle1.resetMultiplier();
         mPaddle2.resetMultiplier();
@@ -76,65 +31,57 @@ const void World::update(const sf::Time& dt)
     mPaddle1.update(dt);
     mPaddle2.update(dt);
     mBall.update(dt);
+    mBallPrediction.update(dt);
 
-    if (mModeText.getColor().a > 0) {
-        int a = mModeText.getColor().a;
-        mModeText.setColor(sf::Color(255,255,255,a -= 3.f));
+    auto& modeText = mTextHolder.get(Texts::Mode);
+    auto& player1Controls = mTextHolder.get(Texts::Player1Controls);
+    auto& player2Controls = mTextHolder.get(Texts::Player2Contols);
+
+    checkScoreChanges();
+
+    if (mBall.getCollisionCheck()) {
+        mBallPrediction = mBall;
+        mBallPrediction.setVelocity(sf::Vector2f(mBall.getVelocity().x * mBallMultiplier, mBall.getVelocity().y * mBallMultiplier));
     }
-    if (mPlayer1Controls.getColor().a > 0) {
-        int a = mPlayer1Controls.getColor().a;
-        mPlayer1Controls.setColor(sf::Color(255,255,255,a -= 1.f));
-        mPlayer2Controls.setColor(mPlayer1Controls.getColor());
+
+    if (modeText.getColor().a > 0) {
+        int a = modeText.getColor().a;
+        modeText.setColor(sf::Color(255,255,255,a -= 3.f));
+    }
+    if (player1Controls.getColor().a > 0) {
+        int a = player1Controls.getColor().a;
+        player1Controls.setColor(sf::Color(255,255,255,a -= 1.f));
+        player2Controls.setColor(player1Controls.getColor());
     }
 }
     // Handle Input
 const void World::handleInput(const sf::Keyboard::Key& key, const bool isPressed)
 {
-    if (mGameMode.PvAI || mGameMode.PvP) {
-        if (key == sf::Keyboard::W)
-            mPaddle1.getMovement().UP = isPressed;
-        if (key == sf::Keyboard::S)
-            mPaddle1.getMovement().DOWN = isPressed;
-    }
+    if (key == sf::Keyboard::W)
+        mPaddle1.getMovement().UP = isPressed;
+    if (key == sf::Keyboard::S)
+        mPaddle1.getMovement().DOWN = isPressed;
 
-    if (mGameMode.PvP) {
-        if (key == sf::Keyboard::Up)
-            mPaddle2.getMovement().UP = isPressed;
-        if (key == sf::Keyboard::Down)
-            mPaddle2.getMovement().DOWN = isPressed;
-    }
-
-    if (isPressed)
-        if (key == sf::Keyboard::T) {
-            if (mGameMode.PvAI) {
-                mGameMode.PvP = true;
-                mGameMode.PvAI = false;
-            }
-            else if (mGameMode.PvP) {
-                mGameMode.AIvAI = true;
-                mGameMode.PvP = false;
-            }
-            else if (mGameMode.AIvAI) {
-                mGameMode.PvAI = true;
-                mGameMode.AIvAI = false;
-            }
-            resetGame();
-            setModeText();
-        }
+    if (key == sf::Keyboard::Up)
+        mPaddle2.getMovement().UP = isPressed;
+    if (key == sf::Keyboard::Down)
+        mPaddle2.getMovement().DOWN = isPressed;
 }
     // Handle AI
-const void World::handleAI()
+const void World::handleAI(const bool mode, const sf::Time& dt)
 {
-    if (mGameMode.AIvAI)
-        mPaddle1.handleAI(mBall);
-    mPaddle2.handleAI(mBall);
+    if (mode)
+        mPaddle1.handleAI(mBall, mBallPrediction, mBallMultiplier, dt);
+    mPaddle2.handleAI(mBall, mBallPrediction, mBallMultiplier, dt);
 }
     // Handle Collision
 const void World::handleCollision()
 {
-    mPaddle1.checkCollision();
-    mPaddle2.checkCollision();
-    mBall.checkCollision(mPaddle1, mPaddle2);
+    mPaddle1.handleCollision();
+    mPaddle2.handleCollision();
+
+    mBall.handleCollision(mPaddle1, mPaddle2, true);
+    mBallPrediction.handleCollision(mPaddle1, mPaddle2, false);
 }
     // Draw
 const void World::draw()
@@ -145,21 +92,51 @@ const void World::draw()
 
     mWindow.draw(line);
 
-    mWindow.draw(mPaddle1.getScoreText());
-    mWindow.draw(mPaddle2.getScoreText());
+    auto& modeText = mTextHolder.get(Texts::Mode);
+    auto& changeMode = mTextHolder.get(Texts::ChangeMode);
+    auto& player1Controls = mTextHolder.get(Texts::Player1Controls);
+    auto& player1Score = mTextHolder.get(Texts::Player1Score);
+    auto& player2Controls = mTextHolder.get(Texts::Player2Contols);
+    auto& player2Score = mTextHolder.get(Texts::Player2Score);
 
-    if (mModeText.getColor().a > 0)
-        mWindow.draw(mModeText);
+    mWindow.draw(player1Score);
+    mWindow.draw(player2Score);
 
-    mWindow.draw(mChangeModeText);
+    if (modeText.getColor().a > 0)
+        mWindow.draw(modeText);
 
-    if (mPlayer1Controls.getColor().a > 0) {
-        mWindow.draw(mPlayer1Controls);
-        mWindow.draw(mPlayer2Controls);
+    mWindow.draw(changeMode);
+
+    if (player1Controls.getColor().a > 0) {
+        mWindow.draw(player1Controls);
+        mWindow.draw(player2Controls);
+    }
+
+ //   mWindow.draw(mBallPrediction.getShape());
+}
+    // Check Score Changes
+const void World::checkScoreChanges()
+{
+    auto& player1Score = mTextHolder.get(Texts::Player1Score);
+    auto& player2Score = mTextHolder.get(Texts::Player2Score);
+
+    static int paddle1Score = 0;
+    static int paddle2Score = 0;
+    if (mPaddle1.getScore() != paddle1Score) {
+        paddle1Score = mPaddle1.getScore();
+        mBallPrediction = mBall;
+        mBallPrediction.setVelocity(sf::Vector2f(mBall.getVelocity().x * mBallMultiplier, mBall.getVelocity().y * mBallMultiplier));
+        mPaddle1.updateScoreText(player1Score);
+    }
+    else if (mPaddle2.getScore() != paddle2Score) {
+        paddle2Score = mPaddle2.getScore();
+        mBallPrediction = mBall;
+        mBallPrediction.setVelocity(sf::Vector2f(mBall.getVelocity().x * mBallMultiplier, mBall.getVelocity().y * mBallMultiplier));
+        mPaddle2.updateScoreText(player2Score);
     }
 }
     // Reset Game
-const void World::resetGame()
+const void World::resetGame(const sf::Font& font)
 {
     Paddle newPaddle1(Paddle::LEFT, Entity::PADDLE, sf::Vector2f(mWindow.getSize().x, mWindow.getSize().y));
     Paddle newPaddle2(Paddle::RIGHT, Entity::PADDLE, sf::Vector2f(mWindow.getSize().x, mWindow.getSize().y));
@@ -168,22 +145,13 @@ const void World::resetGame()
     mPaddle1 = newPaddle1;
     mPaddle2 = newPaddle2;
     mBall = newBall;
-
-    mPaddle1.setFont(mFont);
-    mPaddle2.setFont(mFont);
 }
-    // Set Mode Text
-const void World::setModeText()
+    // Set Fonts
+const void World::setFonts(const sf::Font& font)
 {
-    if (mGameMode.PvAI)
-        mModeText.setString("Player vs AI");
-    else if (mGameMode.PvP)
-        mModeText.setString("Player vs Player");
-    else if (mGameMode.AIvAI)
-        mModeText.setString("AI vs AI");
+    mTextHolder.load(Texts::Player1Controls, font, "Player 1\nW | S to move", 15.f, sf::Vector2f(mWindow.getSize().x / 2 - mWindow.getSize().x / 3, 70.f), sf::Color::White);
+    mTextHolder.load(Texts::Player2Contols, font, "Player 2\nUp | Down", 15.f, sf::Vector2f(mWindow.getSize().x / 2 + mWindow.getSize().x / 3, 70.f), sf::Color::White);
 
-    mModeText.setOrigin(mModeText.getLocalBounds().width / 2,
-                        mModeText.getLocalBounds().height / 2);
-    mModeText.setPosition(mWindow.getSize().x / 2, 95.f);
-    mModeText.setColor(sf::Color(255, 255, 255, 255));
+    mPaddle1.setFont(mTextHolder, font);
+    mPaddle2.setFont(mTextHolder, font);
 }
