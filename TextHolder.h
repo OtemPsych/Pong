@@ -6,7 +6,6 @@
 
 #include <SFML/System/NonCopyable.hpp>
 #include <SFML/Graphics/Text.hpp>
-#include <SFML/Graphics/Vertex.hpp>
 
 namespace Texts {
     enum ID { Mode, ChangeMode, Player1Controls,
@@ -15,16 +14,21 @@ namespace Texts {
 class TextHolder :private sf::NonCopyable
 {
 private:
-// Private Data Member
+// Private Data Members
     std::map<Texts::ID, std::unique_ptr<sf::Text>> mTextHolder;
 
+    sf::Font mFont;
+
 public:
+// Constructor
+    TextHolder();
 // Public Methods
-    const void load(const Texts::ID& id, const sf::Font& font,
-                    const std::string& str, const unsigned charSize,
-                    const sf::Vector2f& pos, const sf::Color& color);
+    const void load(const Texts::ID& id, const std::string& str,
+                    const unsigned charSize, const sf::Vector2f& pos,
+                    const sf::Color& color);
     sf::Text& get(const Texts::ID& id) const;
 
-    const void fadeText(const Texts::ID& id, const float rate) const;
+    const void fadeText(sf::Text& text, const float rate) const;
+    const void correctProperties(sf::Text& text) const;
 };
 #endif // TextHolder_H_

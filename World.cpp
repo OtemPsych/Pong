@@ -34,13 +34,11 @@ const void World::update(const sf::Time& dt)
     mBallPrediction.update(dt);
 
     if (mBall.getCollisionCheck()) {
-        mBallPrediction = mBall;
+        mBallPrediction.getShape().setPosition(mBall.getShape().getPosition());
         mBallPrediction.setVelocity(sf::Vector2f(mBall.getVelocity().x * mBallMultiplier, mBall.getVelocity().y * mBallMultiplier));
     }
 
     checkScoreChanges();
-    mTextHolder.fadeText(Texts::Player1Controls, 1.f);
-    mTextHolder.fadeText(Texts::Player2Controls, 1.f);
 }
     // Handle Input
 const void World::handleInput(const sf::Keyboard::Key& key, const bool isPressed)
@@ -121,7 +119,7 @@ const void World::checkScoreChanges()
     }
 }
     // Reset Game
-const void World::resetGame(const sf::Font& font)
+const void World::resetGame()
 {
     Paddle newPaddle1(Paddle::LEFT, Entity::PADDLE, sf::Vector2f(mWindow.getSize().x, mWindow.getSize().y));
     Paddle newPaddle2(Paddle::RIGHT, Entity::PADDLE, sf::Vector2f(mWindow.getSize().x, mWindow.getSize().y));
@@ -132,11 +130,8 @@ const void World::resetGame(const sf::Font& font)
     mBall = newBall;
 }
     // Set Fonts
-const void World::setFonts(const sf::Font& font)
+const void World::setFonts()
 {
-    mTextHolder.load(Texts::Player1Controls, font, "Player 1\nW | S to move", 15.f, sf::Vector2f(mWindow.getSize().x / 2 - mWindow.getSize().x / 3, 70.f), sf::Color::White);
-    mTextHolder.load(Texts::Player2Controls, font, "Player 2\nUp | Down", 15.f, sf::Vector2f(mWindow.getSize().x / 2 + mWindow.getSize().x / 3, 70.f), sf::Color::White);
-
-    mPaddle1.setFont(mTextHolder, font);
-    mPaddle2.setFont(mTextHolder, font);
+    mPaddle1.setFont(mTextHolder);
+    mPaddle2.setFont(mTextHolder);
 }

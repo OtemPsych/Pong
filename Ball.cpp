@@ -1,7 +1,5 @@
 #include "Ball.h"
 
-#include <cstdlib>
-
 // Constructor
 Ball::Ball(const Type& type, const sf::Vector2f& bounds)
     : Entity(type, bounds)

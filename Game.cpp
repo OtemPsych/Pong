@@ -1,7 +1,5 @@
 #include "Game.h"
 
-#include <stdexcept>
-
 #include <SFML/Window/Event.hpp>
 
 const sf::Time TimePerFrame = sf::seconds(1.f / 60.f);
@@ -12,16 +10,15 @@ Game::Game()
                                              | sf::Style::Titlebar)
     , mTextHolder()
     , mWorld(mTextHolder, mWindow)
+    , mGameMode()
 {
     mWindow.setFramerateLimit(720);
 
     mGameMode.AIvAI = true;
     mGameMode.PvAI = mGameMode.PvP = false;
 
-    if (!mFont.loadFromFile("Media/Sansation.ttf"))
-        throw std::runtime_error("Game::Game() - Failed to load font");
-
     loadTexts();
+    setModeText();
 }
 
 // Private Methods
@@ -49,7 +46,9 @@ const void Game::update(const sf::Time& dt)
 {
     mWorld.update(dt);
 
-    mTextHolder.fadeText(Texts::Mode, 3.f);
+    mTextHolder.fadeText(mTextHolder.get(Texts::Mode), 3.f);
+    mTextHolder.fadeText(mTextHolder.get(Texts::Player1Controls), 2.5f);
+    mTextHolder.fadeText(mTextHolder.get(Texts::Player2Controls), 2.5f);
 }
     // Handle Input
 const void Game::handleInput(const sf::Keyboard::Key& key,
@@ -72,7 +71,7 @@ const void Game::handleInput(const sf::Keyboard::Key& key,
                 mGameMode.AIvAI = false;
             }
             setModeText();
-            mWorld.resetGame(mFont);
+            mWorld.resetGame();
         }
 }
     // Handle AI
@@ -93,31 +92,55 @@ const void Game::render()
     // Set Mode Text
 const void Game::setModeText() const
 {
+    auto& player1 = mTextHolder.get(Texts::Player1Controls);
+    auto& player2 = mTextHolder.get(Texts::Player2Controls);
+
+    if (mGameMode.PvAI) {
+        mTextHolder.correctProperties(player1);
+        mTextHolder.fadeText(player2, 255.f);
+    }
+    else if (mGameMode.PvP) {
+        mTextHolder.correctProperties(player1);
+        mTextHolder.correctProperties(player2);
+    }
+    else if (mGameMode.AIvAI) {
+        mTextHolder.fadeText(player1, 255.f);
+        mTextHolder.fadeText(player2, 255.f);
+    }
+
     auto& mode = mTextHolder.get(Texts::Mode);
-
+    mode.setString(getGameModeString());
+    mTextHolder.correctProperties(mode);
+}
+    // Get Game Mode String
+const std::string Game::getGameModeString() const
+{
     if (mGameMode.PvAI)
-        mode.setString("Player vs AI");
+        return "Player vs AI";
     else if (mGameMode.PvP)
-        mode.setString("Player vs Player");
-    else if (mGameMode.AIvAI)
-        mode.setString("AI vs AI");
-
-    mode.setOrigin(mode.getLocalBounds().width / 2,
-                   mode.getLocalBounds().height / 2);
-    mode.setPosition(mWindow.getSize().x / 2, 95.f);
-    mode.setColor(sf::Color::White);
+        return "Player vs Player";
+    else
+        return "AI vs AI";
 }
     // Load Texts
 const void Game::loadTexts()
 {
-    mTextHolder.load(Texts::Mode, mFont, "AI vs AI", 45.f,
+    mTextHolder.load(Texts::Mode, getGameModeString(), 35.f,
                      sf::Vector2f(mWindow.getSize().x / 2, 95.f), sf::Color::White);
 
-    mTextHolder.load(Texts::ChangeMode, mFont, "Press 'T' to change Game Mode", 15.f,
+    mTextHolder.load(Texts::ChangeMode, "Press 'T' to change Game Mode", 15.f,
                      sf::Vector2f(mWindow.getSize().x - 150.f, mWindow.getSize().y - 20.f),
                      sf::Color::White);
 
-    mWorld.setFonts(mFont);
+    mTextHolder.load(Texts::Player1Controls, "Player 1\nW | S", 15.f,
+                     sf::Vector2f(mWindow.getSize().x / 2 - mWindow.getSize().x / 3, 70.f),
+                     sf::Color::White);
+
+    mTextHolder.load(Texts::Player2Controls, "Player 2\nUp | Down", 15.f,
+                     sf::Vector2f(mWindow.getSize().x / 2 + mWindow.getSize().x / 3, 70.f),
+                     sf::Color::White);
+
+    mWorld.setFonts();
 }
 
 // Public Methods

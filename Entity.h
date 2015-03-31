@@ -1,7 +1,6 @@
 #ifndef Entity_H_
 #define Entity_H_
 
-#include <SFML/Graphics/Vertex.hpp>
 #include <SFML/Graphics/RenderWindow.hpp>
 
 class Entity

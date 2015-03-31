@@ -5,9 +5,6 @@
 #include "Ball.h"
 #include "TextHolder.h"
 
-#include <SFML/Graphics/Font.hpp>
-#include <SFML/Graphics/Text.hpp>
-
 #include <SFML/Graphics/RectangleShape.hpp>
 
 class Ball;
@@ -34,7 +31,7 @@ public:
     const void handleCollision();
     virtual const void update(const sf::Time& dt);
     const void updateScoreText(sf::Text& text);
-    const void setFont(TextHolder& holder, const sf::Font& font);
+    const void setFont(TextHolder& holder);
 
     inline const sf::RectangleShape& getShape() { return mShape; }
     inline movement& getMovement() { return mMovement; }

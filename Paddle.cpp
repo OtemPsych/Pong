@@ -84,12 +84,12 @@ const void Paddle::updateScoreText(sf::Text& text)
     text.setString(NumberToString(mScore));
 }
     // Set Font
-const void Paddle::setFont(TextHolder& holder, const sf::Font& font)
+const void Paddle::setFont(TextHolder& holder)
 {
     if (mSide == LEFT)
-        holder.load(Texts::Player1Score, font, NumberToString(mScore),
+        holder.load(Texts::Player1Score, NumberToString(mScore),
                     48, sf::Vector2f(getBounds().x / 2 - 65.f, 15.f), sf::Color::White);
     else
-        holder.load(Texts::Player2Score, font, NumberToString(mScore),
+        holder.load(Texts::Player2Score, NumberToString(mScore),
                     48, sf::Vector2f(getBounds().x / 2 + 65.f, 15.f), sf::Color::White);
 }

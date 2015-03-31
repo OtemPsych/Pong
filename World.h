@@ -6,8 +6,6 @@
 #include "TextHolder.h"
 
 #include <SFML/Window/Keyboard.hpp>
-#include <SFML/Graphics/RectangleShape.hpp>
-#include <SFML/Graphics/Font.hpp>
 
 class World :private sf::NonCopyable
 {
@@ -36,8 +34,8 @@ public:
     const void draw();
 
     const void checkScoreChanges();
-    const void resetGame(const sf::Font& font);
+    const void resetGame();
 
-    const void setFonts(const sf::Font& font);
+    const void setFonts();
 };
 #endif // World_H_

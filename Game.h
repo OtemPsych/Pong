@@ -2,11 +2,6 @@
 #define Game_H_
 
 #include "World.h"
-#include "TextHolder.h"
-
-#include <SFML/System/NonCopyable.hpp>
-#include <SFML/Window/Keyboard.hpp>
-#include <SFML/Graphics/RenderWindow.hpp>
 
 class Game :private sf::NonCopyable
 {
@@ -14,7 +9,6 @@ private:
 // Private Data Members
     sf::RenderWindow mWindow;
     TextHolder       mTextHolder;
-    sf::Font         mFont;
 
     World            mWorld;
 
@@ -33,6 +27,7 @@ private:
     const void render();
 
     const void setModeText() const;
+    const std::string getGameModeString() const;
     const void loadTexts();
 
 public:
