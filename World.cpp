@@ -6,7 +6,7 @@ World::World(TextHolder& holder, sf::RenderWindow& window)
     , mPaddle2(Paddle::RIGHT, Entity::PADDLE, sf::Vector2f(window.getSize().x, window.getSize().y))
     , mBall(Entity::BALL, sf::Vector2f(window.getSize().x, window.getSize().y))
     , mBallPrediction(Entity::BALL, sf::Vector2f(window.getSize().x, window.getSize().y))
-    , mBallMultiplier(4.f)
+    , mBallMultiplier(2.5f)
     , mTextHolder(holder)
     , mWindow(window)
 {
@@ -34,11 +34,9 @@ const void World::update(const sf::Time& dt)
     mBallPrediction.update(dt);
 
     if (mBall.getCollisionCheck()) {
-        mBallPrediction.getShape().setPosition(mBall.getShape().getPosition());
+        mBallPrediction = mBall;
         mBallPrediction.setVelocity(sf::Vector2f(mBall.getVelocity().x * mBallMultiplier, mBall.getVelocity().y * mBallMultiplier));
     }
-
-    checkScoreChanges();
 }
     // Handle Input
 const void World::handleInput(const sf::Keyboard::Key& key, const bool isPressed)
@@ -87,6 +85,9 @@ const void World::draw()
     if (modeText.getColor().a > 0.f)
         mWindow.draw(modeText);
 
+    // Match Length
+    mWindow.draw(mTextHolder.get(Texts::PlayedTime));
+
     // Change Game Mode
     mWindow.draw(mTextHolder.get(Texts::ChangeMode));
 
@@ -97,26 +98,31 @@ const void World::draw()
         mWindow.draw(mTextHolder.get(Texts::Player2Controls));
     }
 
- //   mWindow.draw(mBallPrediction.getShape());
+  //  mWindow.draw(mBallPrediction.getShape());
 }
     // Check Score Changes
-const void World::checkScoreChanges()
+const bool World::checkScoreChanges()
 {
     static int paddle1Score = 0;
     static int paddle2Score = 0;
 
-    if (mPaddle1.getScore() != paddle1Score) {
-        paddle1Score = mPaddle1.getScore();
-        mBallPrediction = mBall;
-        mBallPrediction.setVelocity(sf::Vector2f(mBall.getVelocity().x * mBallMultiplier, mBall.getVelocity().y * mBallMultiplier));
-        mPaddle1.updateScoreText(mTextHolder.get(Texts::Player1Score));
+    if (mPaddle1.getScore() != paddle1Score || mPaddle2.getScore() != paddle2Score) {
+        if (mPaddle1.getScore() != paddle1Score) {
+            paddle1Score = mPaddle1.getScore();
+            mBallPrediction = mBall;
+            mBallPrediction.setVelocity(sf::Vector2f(mBall.getVelocity().x * mBallMultiplier, mBall.getVelocity().y * mBallMultiplier));
+            mPaddle1.updateScoreText(mTextHolder.get(Texts::Player1Score));
+        }
+        else if (mPaddle2.getScore() != paddle2Score) {
+            paddle2Score = mPaddle2.getScore();
+            mBallPrediction = mBall;
+            mBallPrediction.setVelocity(sf::Vector2f(mBall.getVelocity().x * mBallMultiplier, mBall.getVelocity().y * mBallMultiplier));
+            mPaddle2.updateScoreText(mTextHolder.get(Texts::Player2Score));
+        }
+        return 1;
     }
-    else if (mPaddle2.getScore() != paddle2Score) {
-        paddle2Score = mPaddle2.getScore();
-        mBallPrediction = mBall;
-        mBallPrediction.setVelocity(sf::Vector2f(mBall.getVelocity().x * mBallMultiplier, mBall.getVelocity().y * mBallMultiplier));
-        mPaddle2.updateScoreText(mTextHolder.get(Texts::Player2Score));
-    }
+    else
+        return 0;
 }
     // Reset Game
 const void World::resetGame()

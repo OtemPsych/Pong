@@ -11,7 +11,7 @@ private:
     TextHolder       mTextHolder;
 
     World            mWorld;
-
+    sf::Time         mMatchLength;
     struct {
         bool PvP,
              PvAI,
@@ -28,6 +28,8 @@ private:
 
     const void setModeText() const;
     const std::string getGameModeString() const;
+    const std::string getMatchLengthString() const;
+    const void resetMatchLength() const;
     const void loadTexts();
 
 public:

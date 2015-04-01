@@ -1,8 +1,18 @@
 #include "Game.h"
 
+#include <sstream>
+
 #include <SFML/Window/Event.hpp>
 
 const sf::Time TimePerFrame = sf::seconds(1.f / 60.f);
+
+template <typename T>
+std::string NumberToString(T num)
+{
+    std::ostringstream temp;
+    temp << num;
+    return temp.str();
+}
 
 // Constructor
 Game::Game()
@@ -10,6 +20,7 @@ Game::Game()
                                              | sf::Style::Titlebar)
     , mTextHolder()
     , mWorld(mTextHolder, mWindow)
+    , mMatchLength(sf::Time::Zero)
     , mGameMode()
 {
     mWindow.setFramerateLimit(720);
@@ -46,6 +57,12 @@ const void Game::update(const sf::Time& dt)
 {
     mWorld.update(dt);
 
+    mMatchLength += dt;
+    mTextHolder.get(Texts::PlayedTime).setString(getMatchLengthString());
+
+    if (mWorld.checkScoreChanges())
+        mMatchLength = sf::Time::Zero;
+
     mTextHolder.fadeText(mTextHolder.get(Texts::Mode), 3.f);
     mTextHolder.fadeText(mTextHolder.get(Texts::Player1Controls), 2.5f);
     mTextHolder.fadeText(mTextHolder.get(Texts::Player2Controls), 2.5f);
@@ -71,6 +88,7 @@ const void Game::handleInput(const sf::Keyboard::Key& key,
                 mGameMode.AIvAI = false;
             }
             setModeText();
+            mMatchLength = sf::Time::Zero;
             mWorld.resetGame();
         }
 }
@@ -122,14 +140,30 @@ const std::string Game::getGameModeString() const
     else
         return "AI vs AI";
 }
+    // Get Match Length String
+const std::string Game::getMatchLengthString() const
+{
+    int minutes = (int)mMatchLength.asSeconds() / 60;
+    int seconds = (int)mMatchLength.asSeconds() % 60;
+    int milliseconds = (int)mMatchLength.asMilliseconds() % 1000 / 10;
+
+    return "Match Length: "
+        + ((minutes < 10) ? "0" + NumberToString(minutes) : NumberToString(minutes)) + ":"
+        + ((seconds < 10) ? "0" + NumberToString(seconds) : NumberToString(seconds)) + ":"
+        + ((milliseconds < 10) ? "0" + NumberToString(milliseconds) : NumberToString(milliseconds));
+}
     // Load Texts
 const void Game::loadTexts()
 {
     mTextHolder.load(Texts::Mode, getGameModeString(), 35.f,
                      sf::Vector2f(mWindow.getSize().x / 2, 95.f), sf::Color::White);
 
-    mTextHolder.load(Texts::ChangeMode, "Press 'T' to change Game Mode", 15.f,
+    mTextHolder.load(Texts::ChangeMode, "Press 'T' to change Game Mode", 13.f,
                      sf::Vector2f(mWindow.getSize().x - 150.f, mWindow.getSize().y - 20.f),
+                     sf::Color::White);
+
+    mTextHolder.load(Texts::PlayedTime, getMatchLengthString(),
+                     15.f, sf::Vector2f(150.f, mWindow.getSize().y - 20.f),
                      sf::Color::White);
 
     mTextHolder.load(Texts::Player1Controls, "Player 1\nW | S", 15.f,

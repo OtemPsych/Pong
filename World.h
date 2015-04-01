@@ -33,7 +33,7 @@ public:
     const void handleCollision();
     const void draw();
 
-    const void checkScoreChanges();
+    const bool checkScoreChanges();
     const void resetGame();
 
     const void setFonts();

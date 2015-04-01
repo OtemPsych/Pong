@@ -8,7 +8,7 @@
 #include <SFML/Graphics/Text.hpp>
 
 namespace Texts {
-    enum ID { Mode, ChangeMode, Player1Controls,
+    enum ID { Mode, ChangeMode, PlayedTime, Player1Controls,
               Player1Score, Player2Controls, Player2Score };
 }
 class TextHolder :private sf::NonCopyable
